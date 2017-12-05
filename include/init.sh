@@ -455,7 +455,7 @@ Install_Openssl()
     if [ ! -s /usr/local/openssl/bin/openssl ] || /usr/local/openssl/bin/openssl version | grep -v 'OpenSSL 1.0.2'; then
         Echo_Blue "[+] Installing ${Openssl_Ver}"
         cd ${cur_dir}/src
-        Download_Files ${Download_Mirror}/lib/openssl/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+        Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
         [[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
         Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
         ./config -fPIC --prefix=/usr/local/openssl --openssldir=/usr/local/openssl
