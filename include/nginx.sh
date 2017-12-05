@@ -3,7 +3,7 @@
 Install_Nginx_Openssl()
 {
     if [ "${Enable_Nginx_Openssl}" = 'y' ]; then
-        Download_Files ${Download_Mirror}/lib/openssl/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+        Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
         [[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
         tar zxf ${Openssl_Ver}.tar.gz
         Nginx_With_Openssl="--with-openssl=${cur_dir}/src/${Openssl_Ver}"
