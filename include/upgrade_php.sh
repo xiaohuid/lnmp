@@ -532,7 +532,7 @@ Upgrade_PHP_7()
     #Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
      #[[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
      #tar zxf ${Openssl_Ver}.tar.gz
-     with_openssl="--with-openssl=${cur_dir}/src/${Openssl_Ver}"
+     with_openssl="--with-openssl=/usr/local/ssl"
      export PHP_OPENSSL_DIR=yes
     Check_ICU
     Tarj_Cd php-${php_version}.tar.bz2 php-${php_version}
