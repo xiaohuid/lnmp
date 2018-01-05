@@ -540,6 +540,7 @@ Upgrade_PHP_7()
      Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
      Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
      ./Configure
+     ./config
      make && make install
      cd ${cur_dir}/src
      fi
