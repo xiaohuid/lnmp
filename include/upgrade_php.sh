@@ -535,7 +535,7 @@ Upgrade_PHP_7()
      _openssl_version=`/usr/local/ssl/bin/openssl version |awk {'print $2'} `
      _openssl_short_ver=`echo ${Openssl_Ver} |awk -F '-' '{print $2}'`
      
-     if [ $_openssl_version != $_openssl_short_ver ]
+     if [ $_openssl_version"x" != $_openssl_short_ver"x" ]
      then
      Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
      Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
