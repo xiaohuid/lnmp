@@ -529,9 +529,9 @@ fi
 Upgrade_PHP_7()
 {
     Echo_Blue "[+] Installing ${php_version}"
-    Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
-     [[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
-     tar zxf ${Openssl_Ver}.tar.gz
+    #Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+     #[[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
+     #tar zxf ${Openssl_Ver}.tar.gz
      with_openssl="--with-openssl=${cur_dir}/src/${Openssl_Ver}"
      export PHP_OPENSSL_DIR=yes
     Check_ICU
