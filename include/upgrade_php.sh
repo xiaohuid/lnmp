@@ -532,6 +532,18 @@ Upgrade_PHP_7()
     #Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
      #[[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
      #tar zxf ${Openssl_Ver}.tar.gz
+     _openssl_version=`/usr/local/ssl/bin/openssl version |awk {'print $2'} `
+     _openssl_short_ver=`echo ${Openssl_Ver} |awk -F '-' '{print $2}'`
+     
+     if [ $_openssl_version != $_openssl_short_ver ]
+     then
+     Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+     Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
+     ./Configure
+     make && make install
+     cd ${cur_dir}/src
+     fi
+     
      with_openssl="--with-openssl=/usr/local/ssl"
      export PHP_OPENSSL_DIR=yes
     Check_ICU
