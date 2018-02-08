@@ -248,9 +248,9 @@ Check_Download()
         Download_Files ${Download_Mirror}/lib/tcmalloc/${TCMalloc_Ver}.tar.gz ${TCMalloc_Ver}.tar.gz
         Download_Files ${Download_Mirror}/lib/libunwind/${Libunwind_Ver}.tar.gz ${Libunwind_Ver}.tar.gz
     fi
-    Download_Files http://nginx.org/download/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
+   Download_Files http://nginx.org/download/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
    if [[ "${DBSelect}" =~ ^[1234]$ ]]; then
-	mysql_short_version=`echo ${Mysql_Ver} | cut -d. -f1-2|cut -d- -f2-2`
+	    mysql_short_version=`echo ${Mysql_Ver} | cut -d. -f1-2|cut -d- -f2-2`
         Download_Files http://cdn.mysql.com/Downloads/MySQL-${mysql_short_version}/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
     elif [[ "${DBSelect}" =~ ^[5678]$ ]]; then
         Download_Files ${Download_Mirror}/datebase/mariadb/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
@@ -268,7 +268,7 @@ Check_Download()
         Download_Files ${Download_Mirror}/web/apache/${APR_Ver}.tar.bz2 ${APR_Ver}.tar.bz2
         Download_Files ${Download_Mirror}/web/apache/${APR_Util_Ver}.tar.bz2 ${APR_Util_Ver}.tar.bz2
     fi
-    	Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+    Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
 }
 
 Install_Autoconf()
