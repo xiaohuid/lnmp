@@ -269,6 +269,19 @@ Check_Download()
         Download_Files ${Download_Mirror}/web/apache/${APR_Util_Ver}.tar.bz2 ${APR_Util_Ver}.tar.bz2
     fi
     Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+
+     _openssl_version=`/usr/local/ssl/bin/openssl version |awk {'print $2'} `
+     _openssl_short_ver=`echo ${Openssl_Ver} |awk -F '-' '{print $2}'`
+
+     if [ $_openssl_version"x" != $_openssl_short_ver"x" ]
+     then
+     Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+     Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
+     ./Configure
+     ./config
+     make && make install
+     cd ${cur_dir}/src
+     fi
 }
 
 Install_Autoconf()
