@@ -544,7 +544,7 @@ Del_Database()
     fi
     echo "Your will delete database and MySQL user with same name: ${database_name}"
     echo "Sleep 10s, Press ctrl+c to cancel..."
-    sleep 10
+    Sleep_Sec 10
     cat >/tmp/.del.mysql.sql<<EOF
 DROP USER '${database_name}'@'127.0.0.1';
 DROP USER '${database_name}'@'localhost';
@@ -656,7 +656,7 @@ Del_Ftp()
     Enter_Ftp_Name
     echo "Your will delete ftp user ${ftp_account_name}"
     echo "Sleep 3s,Press ctrl+c to cancel..."
-    sleep 3
+    Sleep_Sec 3
     /usr/local/pureftpd/bin/pure-pw userdel ${ftp_account_name} -f /usr/local/pureftpd/etc/pureftpd.passwd -m
     [ $? -eq 0 ] && echo "FTP User: ${ftp_account_name} deleted Sucessfully." || echo "FTP User: ${ftp_account_name} not exists!"
 }
@@ -715,6 +715,16 @@ Add_SSL_Info_Menu()
         fi
         al="access_log  /home/wwwlogs/${al_name}.log;"
         echo "You access log filename: ${al_name}.log"
+    fi
+
+    email=""
+    Echo_Yellow "Please enter Administrator Email Address: "
+    read email
+    if [ "${email}" == "" ]; then
+        echo "Administrator Email Address will set to webmaster@example.com!"
+        email='webmaster@example.com'
+    else
+        echo "Server Administrator Email:${email}"
     fi
 }
 
@@ -892,6 +902,84 @@ Add_SSL()
     fi
 }
 
+Add_Dns_SSL()
+{
+    provider=$1
+    if [ "${provider}" != "" ]; then
+        dns_provider="dns_${provider}"
+    else
+        Echo_Red "The dns manual mode can not renew automatically, you must renew it manually."
+    fi
+    if [ -s /usr/local/acme.sh/acme.sh ]; then
+        echo "/usr/local/acme.sh/acme.sh [found]"
+    else
+        cd /tmp
+        [[ -f latest.tar.gz ]] && rm -f latest.tar.gz
+        wget https://soft.vpser.net/lib/acme.sh/latest.tar.gz --prefer-family=IPv4 --no-check-certificate
+        tar zxf latest.tar.gz
+        cd acme.sh-*
+        ./acme.sh --install --log --home /usr/local/acme.sh --certhome /usr/local/nginx/conf/ssl
+        cd ..
+        rm -f latest.tar.gz
+        rm -rf acme.sh-*
+        sed -i 's/cat "\$CERT_PATH"$/#cat "\$CERT_PATH"/g' /usr/local/acme.sh/acme.sh
+    fi
+    if [[ ! -s /usr/local/acme.sh/dnsapi/dns_${provider}.sh && "${provider}" != "" ]]; then
+        echo "DNS Provider: ${provider} not found."
+        exit 1
+    fi
+    Add_SSL_Info_Menu
+
+    . "/usr/local/acme.sh/acme.sh.env"
+
+    if [ -s /usr/local/nginx/conf/ssl/${domain}/fullchain.cer ]; then
+        echo "Removing exist domain certificate..."
+        rm -rf /usr/local/nginx/conf/ssl/${domain}
+    fi
+
+    letsdomain=""
+    if [ "${moredomain}" != "" ]; then
+        letsdomain="-d ${domain}"
+        for i in ${moredomain};do
+            letsdomain=${letsdomain}" -d ${i}"
+        done
+    else
+        letsdomain="-d ${domain}"
+    fi
+
+    echo "Starting create SSL Certificate use Let's Encrypt..."
+    if [ "${provider}" != "" ]; then
+        /usr/local/acme.sh/acme.sh --issue ${letsdomain} --dns ${dns_provider} --reloadcmd "/etc/init.d/nginx reload"
+        lets_status=$?
+    else
+        /usr/local/acme.sh/acme.sh --issue ${letsdomain} --dns
+        Echo_Yellow "Please add the above TXT record to the domain in 120 seconds!!!"
+        echo
+        Sleep_Sec 120
+        /usr/local/acme.sh/acme.sh --renew ${letsdomain}
+        lets_status=$?
+    fi
+    if [ "${lets_status}" = 0 ] || [[ "${provider}" = "" && "${lets_status}" = 1 && -s "/usr/local/nginx/conf/ssl/${domain}/fullchain.cer" ]]; then
+        if [ ! -d "${vhostdir}" ]; then
+            echo "Create Virtul Host directory......"
+            mkdir -p ${vhostdir}
+            echo "set permissions of Virtual Host directory......"
+            chmod -R 755 ${vhostdir}
+            chown -R www:www ${vhostdir}
+        fi
+
+        if [ ! -s "/usr/local/nginx/conf/vhost/${domain}.conf" ]; then
+            Add_VHost_Config
+        fi
+        ssl_certificate="/usr/local/nginx/conf/ssl/${domain}/fullchain.cer"
+        ssl_certificate_key="/usr/local/nginx/conf/ssl/${domain}/${domain}.key"
+        Create_SSL_Config
+        Echo_Green "Let's Encrypt SSL Certificate create successfully."
+    else
+        Echo_Red "Let's Encrypt SSL Certificate create failed!"
+    fi
+}
+
 Color_Text()
 {
   echo -e " \e[0;$2m$1\e[0m"
@@ -915,6 +1003,18 @@ Echo_Yellow()
 Echo_Blue()
 {
   echo $(Color_Text "$1" "34")
+}
+
+Sleep_Sec()
+{
+    seconds=$1
+    while [ "${seconds}" -ge "0" ];do
+      echo -ne "\r     \r"
+      echo -n ${seconds}
+      seconds=$(($seconds - 1))
+      sleep 1
+    done
+    echo -ne "\r"
 }
 
 Check_DB
@@ -971,6 +1071,9 @@ case "${arg1}" in
         Add_SSL_Menu
         Add_SSL
         ;;
+    dnsssl)
+        Add_Dns_SSL ${arg2}
+        ;;
     *)
         echo "Usage: lnmp {start|stop|reload|restart|kill|status}"
         echo "Usage: lnmp {nginx|mysql|mariadb|pureftpd|httpd} {start|stop|reload|restart|kill|status}"
@@ -978,5 +1081,6 @@ case "${arg1}" in
         echo "Usage: lnmp database {add|list|edit|del}"
         echo "Usage: lnmp ftp {add|list|edit|del|show}"
         echo "Usage: lnmp ssl add"
+        echo "Usage: lnmp dnsssl {cx|ali|cf|dp|he|gd|aws}"
 esac
 exit

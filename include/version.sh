@@ -14,19 +14,19 @@ Libunwind_Ver='libunwind-1.1'
 Libicu4c_Ver='icu4c-58_1'
 Boost_Ver='boost_1_59_0'
 Openssl_Ver='openssl-1.0.2n'
-Nghttp2_Ver='nghttp2-1.29.0'
+Nghttp2_Ver='nghttp2-1.31.0'
 Luajit_Ver='LuaJIT-2.0.5'
 LuaNginxModule='lua-nginx-module-0.10.11'
 NgxDevelKit='ngx_devel_kit-0.3.0'
-Nginx_Ver='nginx-1.13.9'
+Nginx_Ver='nginx-1.12.2'
 if [ "${DBSelect}" = "1" ]; then
     Mysql_Ver='mysql-5.1.73'
 elif [ "${DBSelect}" = "2" ]; then
     Mysql_Ver='mysql-5.5.58'
 elif [ "${DBSelect}" = "3" ]; then
-    Mysql_Ver='mysql-5.6.39'
+    Mysql_Ver='mysql-5.6.38'
 elif [ "${DBSelect}" = "4" ]; then
-    Mysql_Ver='mysql-5.7.21'
+    Mysql_Ver='mysql-5.7.20'
 elif [ "${DBSelect}" = "5" ]; then
     Mariadb_Ver='mariadb-5.5.58'
 elif [ "${DBSelect}" = "6" ]; then
@@ -56,7 +56,7 @@ fi
 if [[ "${PHPSelect}" =~ ^[123]$ ]]; then
     PhpMyAdmin_Ver='phpMyAdmin-4.0.10.20-all-languages'
 else
-    PhpMyAdmin_Ver='phpMyAdmin-4.7.8-all-languages'
+    PhpMyAdmin_Ver='phpMyAdmin-4.7.9-all-languages'
 fi
 APR_Ver='apr-1.6.3'
 APR_Util_Ver='apr-util-1.6.1'
@@ -69,16 +69,16 @@ fi
 Pureftpd_Ver='pure-ftpd-1.0.47'
 
 XCache_Ver='xcache-3.2.0'
-ImageMagick_Ver='ImageMagick-7.0.7-23'
+ImageMagick_Ver='ImageMagick-7.0.7-25'
 Imagick_Ver='imagick-3.4.3'
 ZendOpcache_Ver='zendopcache-7.0.5'
-Redis_Stable_Ver='redis-4.0.6'
+Redis_Stable_Ver='redis-4.0.8'
 PHPRedis_Ver='redis-3.1.6'
-Memcached_Ver='memcached-1.5.5'
+Memcached_Ver='memcached-1.5.6'
 Libmemcached_Ver='libmemcached-1.0.18'
 PHPMemcached_Ver='memcached-2.2.0'
 PHP7Memcached_Ver='memcached-3.0.4'
 PHPMemcache_Ver='memcache-3.0.8'
 PHPOldApcu_Ver='apcu-4.0.11'
-PHPNewApcu_Ver='apcu-5.1.9'
-PHPApcu_Bc_Ver='apcu_bc-1.0.3'
+PHPNewApcu_Ver='apcu-5.1.11'
+PHPApcu_Bc_Ver='apcu_bc-1.0.4'
