@@ -210,7 +210,7 @@ CentOS_Dependent()
     fi
 
     Echo_Blue "[+] Yum installing dependent packages..."
-    for packages in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget crontabs libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-deve libaio-devel;
+    for packages in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget crontabs libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-devel libaio-devel;
     do yum -y install $packages; done
 
     if [ -s /etc/yum.conf.lnmp ]; then
@@ -234,21 +234,20 @@ Check_Download()
 {
     Echo_Blue "[+] Downloading files..."
     cd ${cur_dir}/src
-    Download_Files ${Download_Mirror}/lib/autoconf/${Autoconf_Ver}.tar.gz ${Autoconf_Ver}.tar.gz
     Download_Files ${Download_Mirror}/web/libiconv/${Libiconv_Ver}.tar.gz ${Libiconv_Ver}.tar.gz
     Download_Files ${Download_Mirror}/web/libmcrypt/${LibMcrypt_Ver}.tar.gz ${LibMcrypt_Ver}.tar.gz
     Download_Files ${Download_Mirror}/web/mcrypt/${Mcypt_Ver}.tar.gz ${Mcypt_Ver}.tar.gz
     Download_Files ${Download_Mirror}/web/mhash/${Mhash_Ver}.tar.bz2 ${Mhash_Ver}.tar.bz2
     Download_Files ${Download_Mirror}/lib/freetype/${Freetype_Ver}.tar.bz2 ${Freetype_Ver}.tar.bz2
-    Download_Files ${Download_Mirror}/lib/curl/${Curl_Ver}.tar.bz2 ${Curl_Ver}.tar.bz2
-    Download_Files ${Download_Mirror}/web/pcre/${Pcre_Ver}.tar.bz2 ${Pcre_Ver}.tar.bz2
     if [ "${SelectMalloc}" = "2" ]; then
         Download_Files ${Download_Mirror}/lib/jemalloc/${Jemalloc_Ver}.tar.bz2 ${Jemalloc_Ver}.tar.bz2
     elif [ "${SelectMalloc}" = "3" ]; then
         Download_Files ${Download_Mirror}/lib/tcmalloc/${TCMalloc_Ver}.tar.gz ${TCMalloc_Ver}.tar.gz
         Download_Files ${Download_Mirror}/lib/libunwind/${Libunwind_Ver}.tar.gz ${Libunwind_Ver}.tar.gz
     fi
-    Download_Files ${Download_Mirror}/web/nginx/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
+    if [ "${Stack}" != "lamp" ]; then
+        Download_Files ${Download_Mirror}/web/nginx/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
+    fi
     if [[ "${DBSelect}" =~ ^[1234]$ ]]; then
         Download_Files ${Download_Mirror}/datebase/mysql/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
     elif [[ "${DBSelect}" =~ ^[5678]$ ]]; then
@@ -271,6 +270,8 @@ Check_Download()
 Install_Autoconf()
 {
     Echo_Blue "[+] Installing ${Autoconf_Ver}"
+    cd ${cur_dir}/src
+    Download_Files ${Download_Mirror}/lib/autoconf/${Autoconf_Ver}.tar.gz ${Autoconf_Ver}.tar.gz
     Tar_Cd ${Autoconf_Ver}.tar.gz ${Autoconf_Ver}
     ./configure --prefix=/usr/local/autoconf-2.13
     make && make install
@@ -355,6 +356,8 @@ Install_Curl()
 {
     if [[ ! -s /usr/local/curl/bin/curl || ! -s /usr/local/curl/lib/libcurl.so || ! -s /usr/local/curl/include/curl/curl.h ]]; then
         Echo_Blue "[+] Installing ${Curl_Ver}"
+        cd ${cur_dir}/src
+        Download_Files ${Download_Mirror}/lib/curl/${Curl_Ver}.tar.bz2 ${Curl_Ver}.tar.bz2
         Tarj_Cd ${Curl_Ver}.tar.bz2 ${Curl_Ver}
         ./configure --prefix=/usr/local/curl --enable-ares --without-nss --with-ssl
         make && make install
@@ -368,6 +371,8 @@ Install_Pcre()
 {
     if [ ! -s /usr/bin/pcre-config ] || /usr/bin/pcre-config --version | grep -vEqi '^8.'; then
         Echo_Blue "[+] Installing ${Pcre_Ver}"
+        cd ${cur_dir}/src
+        Download_Files ${Download_Mirror}/web/pcre/${Pcre_Ver}.tar.bz2 ${Pcre_Ver}.tar.bz2
         Tarj_Cd ${Pcre_Ver}.tar.bz2 ${Pcre_Ver}
         ./configure
         make && make install

@@ -70,6 +70,44 @@ lnmp.conf配置文件，可以修改lnmp.conf自定义下载服务器地址、�
 * 可选6，执行：`./cut_nginx_logs.sh` 日志切割脚本。
 * 可选7，执行：`./remove_disable_function.sh` 运行此脚本可删掉禁用函数。
 
+### 无人值守安装
+* 设置如下环境变量即可完全无人值守安装
+
+变量名 | 变量值含义
+--- | ---
+LNMP_Auto | 启用无人值守自动安装
+DBSelect | 数据库版本序号
+DB_Root_Password | 数据库root密码（不可为空），不安装数据库时可不加该参数
+InstallInnodb | 是否安装Innodb引擎，y 或 n ，不安装数据库时可不加该参数
+PHPSelect | PHP版本序号
+SelectMalloc | 内存分配器版本序号
+ApacheSelect | Apache版本序号，仅LNMPA和LAMP模式需添加该参数
+ServerAdmin | 管理员邮箱，仅LNMPA和LAMP模式需添加该参数
+
+* 各程序版本对应序号
+
+MySQL版本 | 对应序号 | PHP版本 | 对应序号 | 内存分配器 | 对应序号 | Apache版本 | 对应序号
+:------: | :------: | :------: | :------: | :------: | :--------: | :--------: | :--------:
+MySQL 5.1 | 1 | PHP 5.2 | 1 | 不安装 | 1 | Apache 2.2 | 1
+MySQL 5.5 | 2 | PHP 5.3 | 2 | Jemalloc | 2 | Apache 2.4 | 2
+MySQL 5.6 | 3 | PHP 5.4 | 3 | TCMalloc | 3 | |
+MySQL 5.7 | 4 | PHP 5.5 | 4 | | | |
+MariaDB 5.5 | 5 | PHP 5.6 | 5 | | | |
+MariaDB 10.0 | 6 | PHP 7.0 | 6 | | | |
+MariaDB 10.1 | 7 | PHP 7.1 | 7 | | | |
+MariaDB 10.2 | 8 | PHP 7.2 | 8 | | | |
+不安装数据库 | 0 | | | | | |
+
+* 以LNMP模式，默认选项安装MySQL 5.5、MySQL root密码设置为lnmp.org、启用InnoDB、PHP 5.6、不安装内存分配器为例，先执行([建议先运行screen](https://www.vpser.net/manage/run-screen-lnmp.html))，再下载解压lnmp安装包：
+
+`wget http://soft.vpser.net/lnmp/lnmp1.5beta.tar.gz -cO lnmp1.5beta.tar.gz && tar zxf lnmp1.5beta.tar.gz && cd lnmp1.5`
+
+然后设置无人值守参数并安装：
+
+`LNMP_Auto="y" DBSelect="2" DB_Root_Password="lnmp.org" InstallInnodb="y" PHPSelect="5" SelectMalloc="1" ./install.sh lnmp`
+
+(如果缺失参数的话还是会有要求选择缺失选项的提示)。
+
 ### 卸载
 * 卸载LNMP、LNMPA或LAMP可执行：`./uninstall.sh` 按提示选择即可卸载。
 
@@ -89,6 +127,7 @@ lnmp.conf配置文件，可以修改lnmp.conf自定义下载服务器地址、�
 * 数据库管理：`lnmp database {add|list|edit|del}`
 * FTP用户管理：`lnmp ftp {add|list|edit|del|show}`
 * SSL添加：`lnmp ssl add`
+* 通配符/泛域名SSL添加：`lnmp dnsssl {cx|ali|cf|dp|he|gd|aws}` 需依赖域名dns api
 
 ## 相关图形界面
 * PHPMyAdmin：http://yourIP/phpmyadmin/
@@ -118,6 +157,20 @@ lnmp.conf配置文件，可以修改lnmp.conf自定义下载服务器地址、�
 * PHP-FPM配置文件：/usr/local/php/etc/php-fpm.conf
 * PureFtpd配置文件：/usr/local/pureftpd/etc/pure-ftpd.conf
 * Apache配置文件：/usr/local/apache/conf/httpd.conf
+
+### lnmp.conf 配置文件参数说明
+
+| 参数名称 | 参数介绍 | 例子 |
+| :-------: | :---------: | :--------: | 
+|Download_Mirror|下载镜像|一般默认，如异常可[修改下载镜像](https://lnmp.org/faq/download-url.html)|
+|Nginx_Modules_Options|添加Nginx模块或其他编译参数|--add-module=/第三方模块源码目录|
+|PHP_Modules_Options|添加PHP模块或编译参数|--enable-exif 有些模块需提前安装好依赖包|
+|MySQL_Data_Dir|MySQL数据库目录设置|默认/usr/local/mysql/var|
+|MariaDB_Data_Dir|MariaDB数据库目录设置|默认/usr/local/mariadb/var|
+|Default_Website_Dir|默认虚拟主机网站目录位置|默认/home/wwwroot/default|
+|Enable_Nginx_Openssl|Nginx是否使用新版openssl|默认 y，建议不修改，y是启用并开启到http2|
+|Enable_PHP_Fileinfo|是否安装开启php的fileinfo模块|默认n，根据自己情况而定，安装启用的话改成 y|
+|Enable_Nginx_Lua|是否为Nginx安装lua支持|默认n，安装lua可以使用一些基于lua的waf网站防火墙|
 
 ## 技术支持
 
