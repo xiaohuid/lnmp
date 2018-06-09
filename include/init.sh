@@ -173,7 +173,7 @@ Ubuntu_Deadline()
 {
     trusty_deadline=`date -d "2019-7-22 00:00:00" +%s`
     artful_deadline=`date -d "2018-7-31 00:00:00" +%s`
-    xenial_deadline=`date -d "2021-4-31 00:00:00" +%s`
+    xenial_deadline=`date -d "2021-4-30 00:00:00" +%s`
     cur_time=`date  +%s`
     case "$1" in
         trusty)
@@ -205,7 +205,7 @@ CentOS_Dependent()
     fi
 
     Echo_Blue "[+] Yum installing dependent packages..."
-    for packages in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget crontabs libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-devel libaio-devel;
+    for packages in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget crontabs libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-devel libaio-devel rpcgen libtirpc-devel perl;
     do yum -y install $packages; done
 
     if [ -s /etc/yum.conf.lnmp ]; then
@@ -221,7 +221,7 @@ Deb_Dependent()
     apt-get -fy install
     export DEBIAN_FRONTEND=noninteractive
     apt-get --no-install-recommends install -y build-essential gcc g++ make
-    for packages in debian-keyring debian-archive-keyring build-essential gcc g++ make cmake autoconf automake re2c wget cron bzip2 libzip-dev libc6-dev bison file rcconf flex vim bison m4 gawk less cpp binutils diffutils unzip tar bzip2 libbz2-dev libncurses5 libncurses5-dev libtool libevent-dev openssl libssl-dev zlibc libsasl2-dev libltdl3-dev libltdl-dev zlib1g zlib1g-dev libbz2-1.0 libbz2-dev libglib2.0-0 libglib2.0-dev libpng3 libjpeg-dev libpng-dev libpng12-0 libpng12-dev libkrb5-dev curl libcurl3 libcurl3-gnutls libcurl4-gnutls-dev libcurl4-openssl-dev libpq-dev libpq5 gettext libpng12-dev libxml2-dev libcap-dev ca-certificates libc-client2007e-dev psmisc patch git libc-ares-dev libicu-dev e2fsprogs libxslt libxslt1-dev libc-client-dev xz-utils libexpat1-dev libaio-dev;
+    for packages in debian-keyring debian-archive-keyring build-essential gcc g++ make cmake autoconf automake re2c wget cron bzip2 libzip-dev libc6-dev bison file rcconf flex vim bison m4 gawk less cpp binutils diffutils unzip tar bzip2 libbz2-dev libncurses5 libncurses5-dev libtool libevent-dev openssl libssl-dev zlibc libsasl2-dev libltdl3-dev libltdl-dev zlib1g zlib1g-dev libbz2-1.0 libbz2-dev libglib2.0-0 libglib2.0-dev libpng3 libjpeg-dev libpng-dev libpng12-0 libpng12-dev libkrb5-dev curl libcurl3-gnutls libcurl4-gnutls-dev libcurl4-openssl-dev libpq-dev libpq5 gettext libpng12-dev libxml2-dev libcap-dev ca-certificates libc-client2007e-dev psmisc patch git libc-ares-dev libicu-dev e2fsprogs libxslt libxslt1-dev libc-client-dev xz-utils libexpat1-dev libaio-dev libtirpc-dev;
     do apt-get --no-install-recommends install -y $packages; done
 }
 
@@ -233,7 +233,6 @@ Check_Download()
     Download_Files ${Download_Mirror}/web/libmcrypt/${LibMcrypt_Ver}.tar.gz ${LibMcrypt_Ver}.tar.gz
     Download_Files ${Download_Mirror}/web/mcrypt/${Mcypt_Ver}.tar.gz ${Mcypt_Ver}.tar.gz
     Download_Files ${Download_Mirror}/web/mhash/${Mhash_Ver}.tar.bz2 ${Mhash_Ver}.tar.bz2
-    Download_Files ${Download_Mirror}/lib/freetype/${Freetype_Ver}.tar.bz2 ${Freetype_Ver}.tar.bz2
     if [ "${SelectMalloc}" = "2" ]; then
         Download_Files ${Download_Mirror}/lib/jemalloc/${Jemalloc_Ver}.tar.bz2 ${Jemalloc_Ver}.tar.bz2
     elif [ "${SelectMalloc}" = "3" ]; then
@@ -296,7 +295,6 @@ Install_Libiconv()
 {
     Echo_Blue "[+] Installing ${Libiconv_Ver}"
     Tar_Cd ${Libiconv_Ver}.tar.gz ${Libiconv_Ver}
-    patch -p0 < ${cur_dir}/src/patch/libiconv-glibc-2.16.patch
     ./configure --enable-static
     Make_Install
     cd ${cur_dir}/src/
@@ -350,17 +348,24 @@ Install_Mhash()
 
 Install_Freetype()
 {
-    Echo_Blue "[+] Installing ${Freetype_Ver}"
-    Tarj_Cd ${Freetype_Ver}.tar.bz2 ${Freetype_Ver}
+    if [[ "${DISTRO}" = "Ubuntu" && "${Ubuntu_Version}" = "18.04" ]]; then
+        Download_Files ${Download_Mirror}/lib/freetype/${Freetype_New_Ver}.tar.bz2 ${Freetype_New_Ver}.tar.bz2
+        Echo_Blue "[+] Installing ${Freetype_New_Ver}"
+        Tarj_Cd ${Freetype_New_Ver}.tar.bz2 ${Freetype_New_Ver}
+    else
+        Download_Files ${Download_Mirror}/lib/freetype/${Freetype_Ver}.tar.bz2 ${Freetype_Ver}.tar.bz2
+        Echo_Blue "[+] Installing ${Freetype_Ver}"
+        Tarj_Cd ${Freetype_Ver}.tar.bz2 ${Freetype_Ver}
+    fi
     ./configure --prefix=/usr/local/freetype
     Make_Install
 
+    [[ -d /usr/lib/pkgconfig ]] && \cp /usr/local/freetype/lib/pkgconfig/freetype2.pc /usr/lib/pkgconfig/
     cat > /etc/ld.so.conf.d/freetype.conf<<EOF
 /usr/local/freetype/lib
 EOF
     ldconfig
-    ln -sf /usr/local/freetype/include/freetype2 /usr/local/include
-    ln -sf /usr/local/freetype/include/ft2build.h /usr/local/include
+    ln -sf /usr/local/freetype/include/freetype2/* /usr/include/
     cd ${cur_dir}/src/
     rm -rf ${cur_dir}/src/${Freetype_Ver}
 }
@@ -404,6 +409,7 @@ Install_Jemalloc()
     ldconfig
     cd ${cur_dir}/src/
     rm -rf ${cur_dir}/src/${Jemalloc_Ver}
+    ln -sf /usr/local/lib/libjemalloc* /usr/lib/
 }
 
 Install_TCMalloc()
@@ -426,6 +432,7 @@ Install_TCMalloc()
     ldconfig
     cd ${cur_dir}/src/
     rm -rf ${cur_dir}/src/${TCMalloc_Ver}
+    ln -sf /usr/local/lib/libtcmalloc* /usr/lib/
 }
 
 Install_Icu4c()

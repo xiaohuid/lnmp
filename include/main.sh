@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DB_Info=('MySQL 5.1.73' 'MySQL 5.5.60' 'MySQL 5.6.40' 'MySQL 5.7.22' 'MySQL 8.0.11' 'MariaDB 5.5.59' 'MariaDB 10.0.34' 'MariaDB 10.1.32' 'MariaDB 10.2.14')
-PHP_Info=('PHP 5.2.17' 'PHP 5.3.29' 'PHP 5.4.45' 'PHP 5.5.38' 'PHP 5.6.35' 'PHP 7.0.29' 'PHP 7.1.16' 'PHP 7.2.4')
+DB_Info=('MySQL 5.1.73' 'MySQL 5.5.60' 'MySQL 5.6.40' 'MySQL 5.7.22' 'MySQL 8.0.11' 'MariaDB 5.5.60' 'MariaDB 10.0.35' 'MariaDB 10.1.33' 'MariaDB 10.2.14')
+PHP_Info=('PHP 5.2.17' 'PHP 5.3.29' 'PHP 5.4.45' 'PHP 5.5.38' 'PHP 5.6.36' 'PHP 7.0.30' 'PHP 7.1.18' 'PHP 7.2.6')
 Apache_Info=('Apache 2.2.34' 'Apache 2.4.33')
 
 Database_Selection()
@@ -198,17 +198,17 @@ MemoryAllocator_Selection()
 
     if [ "${SelectMalloc}" =  "1" ]; then
         MySQL51MAOpt=''
-        MySQL55MAOpt=''
+        MySQLMAOpt=''
         NginxMAOpt=''
     elif [ "${SelectMalloc}" =  "2" ]; then
         MySQL51MAOpt='--with-mysqld-ldflags=-ljemalloc'
-        MySQL55MAOpt="-DCMAKE_EXE_LINKER_FLAGS='-ljemalloc' -DWITH_SAFEMALLOC=OFF"
-        MariaDBMAOpt=''
+        MySQLMAOpt='[mysqld_safe]
+malloc-lib=/usr/lib/libjemalloc.so'
         NginxMAOpt="--with-ld-opt='-ljemalloc'"
     elif [ "${SelectMalloc}" =  "3" ]; then
         MySQL51MAOpt='--with-mysqld-ldflags=-ltcmalloc'
-        MySQL55MAOpt="-DCMAKE_EXE_LINKER_FLAGS='-ltcmalloc' -DWITH_SAFEMALLOC=OFF"
-        MariaDBMAOpt="-DCMAKE_EXE_LINKER_FLAGS='-ltcmalloc' -DWITH_SAFEMALLOC=OFF"
+        MySQLMAOpt='[mysqld_safe]
+malloc-lib=/usr/lib/libtcmalloc.so'
         NginxMAOpt='--with-google_perftools_module'
     fi
 }
