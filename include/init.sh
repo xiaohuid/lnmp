@@ -270,8 +270,8 @@ Check_Download()
      then
      Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
      Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
-     ./Configure
-     ./config
+     ./Configure --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
+     ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
      make && make install
      cd ${cur_dir}/src
      fi
