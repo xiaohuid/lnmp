@@ -516,23 +516,8 @@ fi
 Upgrade_PHP_7()
 {
     Echo_Blue "[+] Installing ${php_version}"
-    #Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
-     #[[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
-     #tar zxf ${Openssl_Ver}.tar.gz
-     _openssl_version=`/usr/local/ssl/bin/openssl version |awk {'print $2'} `
-     _openssl_short_ver=`echo ${Openssl_Ver} |awk -F '-' '{print $2}'`
-
-     if [ $_openssl_version"x" != $_openssl_short_ver"x" ]
-     then
-     Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
-     Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
-     ./Configure --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
-     ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
-     make && make install
-     cd ${cur_dir}/src
-     fi
-
-     with_openssl="--with-openssl=/usr/local/ssl"
+    Update_Openssl
+    with_openssl="--with-openssl=/usr/local/ssl"
      export PHP_OPENSSL_DIR=yes
     Tarj_Cd php-${php_version}.tar.bz2 php-${php_version}
     if [ "${Stack}" = "lnmp" ]; then
@@ -609,6 +594,7 @@ fi
 Upgrade_PHP_72()
 {
     Echo_Blue "[+] Installing ${php_version}"
+    Update_Openssl
     Check_ICU
     Tarj_Cd php-${php_version}.tar.bz2 php-${php_version}
     if [ "${Stack}" = "lnmp" ]; then
