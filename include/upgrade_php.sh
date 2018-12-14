@@ -595,6 +595,8 @@ Upgrade_PHP_72()
 {
     Echo_Blue "[+] Installing ${php_version}"
     Update_Openssl
+    with_openssl="--with-openssl=/usr/local/ssl"
+     export PHP_OPENSSL_DIR=yes
     Check_ICU
     Tarj_Cd php-${php_version}.tar.bz2 php-${php_version}
     if [ "${Stack}" = "lnmp" ]; then
