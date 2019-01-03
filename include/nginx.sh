@@ -3,10 +3,22 @@
 Install_Nginx_Openssl()
 {
     if [ "${Enable_Nginx_Openssl}" = 'y' ]; then
-        Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
-        [[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
-        tar zxf ${Openssl_Ver}.tar.gz
-        Nginx_With_Openssl="--with-openssl=${cur_dir}/src/${Openssl_Ver}"
+        if [ ! -n "${Nginx_Version}" ]; then
+            Nginx_Version=$(echo ${Nginx_Ver} | sed "s/nginx-//")
+        fi
+        Nginx_Ver_Com=$(${cur_dir}/include/version_compare 1.13.0 ${Nginx_Version})
+        if [[ "${Nginx_Ver_Com}" == "0" ||  "${Nginx_Ver_Com}" == "1" ]]; then
+            Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
+            [[ -d "${Openssl_Ver}" ]] && rm -rf ${Openssl_Ver}
+            tar zxf ${Openssl_Ver}.tar.gz
+            Nginx_With_Openssl="--with-openssl=${cur_dir}/src/${Openssl_Ver}"
+        else
+            Download_Files https://www.openssl.org/source/${Openssl_New_Ver}.tar.gz ${Openssl_New_Ver}}.tar.gz
+            [[ -d "${Openssl_New_Ver}" ]] && rm -rf ${Openssl_New_Ver}
+            tar zxf ${Openssl_New_Ver}.tar.gz
+            Nginx_With_Openssl="--with-openssl=${cur_dir}/src/${Openssl_New_Ver} --with-openssl-opt='enable-weak-ssl-ciphers'"
+        fi
+
     fi
 }
 
@@ -61,13 +73,15 @@ Install_Nginx()
     Install_Nginx_Openssl
     Install_Nginx_Lua
     Tar_Cd ${Nginx_Ver}.tar.gz ${Nginx_Ver}
-    if [[ "${DISTRO}" = "Fedora" && "${Fedora_Version}" = "28" ]]; then
+    if [[ "${DISTRO}" = "Fedora" && ${Fedora_Version} -ge 28 ]]; then
         patch -p1 < ${cur_dir}/src/patch/nginx-libxcrypt.patch
     fi
-    if gcc -dumpversion|grep -q "^[8]"; then
+    Nginx_Ver_Com=$(${cur_dir}/include/version_compare 1.14.2 ${Nginx_Version})
+    if gcc -dumpversion|grep -q "^[8]" && [ "${Nginx_Ver_Com}" == "1" ]; then
         patch -p1 < ${cur_dir}/src/patch/nginx-gcc8.patch
     fi
-    if echo ${Nginx_Ver} | grep -Eqi 'nginx-[0-1].[5-8].[0-9]' || echo ${Nginx_Ver} | grep -Eqi 'nginx-1.9.[1-4]$'; then
+    Nginx_Ver_Com=$(${cur_dir}/include/version_compare 1.9.4 ${Nginx_Version})
+    if [[ "${Nginx_Ver_Com}" == "0" ||  "${Nginx_Ver_Com}" == "1" ]]; then
         ./configure --user=www --group=www --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-http_spdy_module --with-http_gzip_static_module --with-ipv6 --with-http_sub_module ${Nginx_With_Openssl} ${Nginx_Module_Lua} ${NginxMAOpt} ${Nginx_Modules_Options}
     else
         ./configure --user=www --group=www --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-http_v2_module --with-http_gzip_static_module --with-http_sub_module --with-stream --with-stream_ssl_module ${Nginx_With_Openssl} ${Nginx_Module_Lua} ${NginxMAOpt} ${Nginx_Modules_Options}
@@ -92,6 +106,7 @@ Install_Nginx()
     \cp conf/enable-php-pathinfo.conf /usr/local/nginx/conf/enable-php-pathinfo.conf
     \cp conf/enable-ssl-example.conf /usr/local/nginx/conf/enable-ssl-example.conf
     \cp conf/magento2-example.conf /usr/local/nginx/conf/magento2-example.conf
+    \cp conf/nginx-reverse-proxy-example.conf /usr/local/nginx/conf/nginx-reverse-proxy-example.conf
     if [ "${Enable_Nginx_Lua}" = 'y' ]; then
         sed -i "/location \/nginx_status/i\        location /lua\n        {\n            default_type text/html;\n            content_by_lua 'ngx.say\(\"hello world\"\)';\n        }\n" /usr/local/nginx/conf/nginx.conf
     fi
