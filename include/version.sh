@@ -18,10 +18,11 @@ Boost_New_Ver='boost_1_67_0'
 Openssl_Ver='openssl-1.0.2q'
 Openssl_New_Ver='openssl-1.1.1a'
 Nghttp2_Ver='nghttp2-1.35.0'
+
 Luajit_Ver='LuaJIT-2.0.5'
 LuaNginxModule='lua-nginx-module-0.10.13'
 NgxDevelKit='ngx_devel_kit-0.3.0'
-Nginx_Ver='nginx-1.14.2'
+Nginx_Ver='nginx-1.15.7'
 if [ "${DBSelect}" = "1" ]; then
     Mysql_Ver='mysql-5.1.73'
 elif [ "${DBSelect}" = "2" ]; then

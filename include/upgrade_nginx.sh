@@ -25,7 +25,7 @@ Upgrade_Nginx()
     echo "+---------------------------------------------------------+"
 
     Press_Start
-
+    lnmp stop
     echo "============================check files=================================="
     cd ${cur_dir}/src
     if [ -s nginx-${Nginx_Version}.tar.gz ]; then
@@ -84,6 +84,7 @@ Upgrade_Nginx()
     if [[ -s /usr/local/nginx/conf/nginx.conf && -s /usr/local/nginx/sbin/nginx ]]; then
         echo "Program will display Nginx Version......"
         /usr/local/nginx/sbin/nginx -v
+	lnmp start
         Echo_Green "======== upgrade nginx completed ======"
     else
         Echo_Red "Error: Nginx upgrade failed."
