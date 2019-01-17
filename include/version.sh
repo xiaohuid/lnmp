@@ -17,12 +17,11 @@ Boost_Ver='boost_1_59_0'
 Boost_New_Ver='boost_1_67_0'
 Openssl_Ver='openssl-1.0.2q'
 Openssl_New_Ver='openssl-1.1.1a'
-Nghttp2_Ver='nghttp2-1.35.0'
-
+Nghttp2_Ver='nghttp2-1.35.1'
 Luajit_Ver='LuaJIT-2.0.5'
 LuaNginxModule='lua-nginx-module-0.10.13'
 NgxDevelKit='ngx_devel_kit-0.3.0'
-Nginx_Ver='nginx-1.15.7'
+Nginx_Ver='nginx-1.14.2'
 if [ "${DBSelect}" = "1" ]; then
     Mysql_Ver='mysql-5.1.73'
 elif [ "${DBSelect}" = "2" ]; then
@@ -53,20 +52,20 @@ elif [ "${PHPSelect}" = "3" ]; then
 elif [ "${PHPSelect}" = "4" ]; then
     Php_Ver='php-5.5.38'
 elif [ "${PHPSelect}" = "5" ]; then
-    Php_Ver='php-5.6.39'
+    Php_Ver='php-5.6.40'
 elif [ "${PHPSelect}" = "6" ]; then
     Php_Ver='php-7.0.33'
 elif [ "${PHPSelect}" = "7" ]; then
-    Php_Ver='php-7.1.25'
+    Php_Ver='php-7.1.26'
 elif [ "${PHPSelect}" = "8" ]; then
-    Php_Ver='php-7.2.13'
+    Php_Ver='php-7.2.14'
 elif [ "${PHPSelect}" = "9" ]; then
-    Php_Ver='php-7.3.0'
+    Php_Ver='php-7.3.1'
 fi
 if [[ "${PHPSelect}" =~ ^[123]$ ]]; then
     PhpMyAdmin_Ver='phpMyAdmin-4.0.10.20-all-languages'
 else
-    PhpMyAdmin_Ver='phpMyAdmin-4.8.3-all-languages'
+    PhpMyAdmin_Ver='phpMyAdmin-4.8.4-all-languages'
 fi
 APR_Ver='apr-1.6.5'
 APR_Util_Ver='apr-util-1.6.1'

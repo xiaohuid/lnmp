@@ -1,26 +1,5 @@
 #!/bin/bash
 
-Update_Openssl()
-{
-     _openssl_version=`/usr/local/ssl/bin/openssl version |awk {'print $2'} `
-     _openssl_short_ver=`echo ${Openssl_Ver} |awk -F '-' '{print $2}'`
-
-     if [ $_openssl_version"x" != $_openssl_short_ver"x" ]
-     then
-     Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
-     Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
-     ./Configure --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
-     ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
-     make && make install
-     ./Configure 
-     ./config
-     make install
-     cd ${cur_dir}/src
-     fi
-
-
-}
-
 Set_Timezone()
 {
     Echo_Blue "Setting timezone..."
@@ -245,7 +224,7 @@ CentOS_Dependent()
     fi
 
     Echo_Blue "[+] Yum installing dependent packages..."
-    for packages in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget crontabs libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-devel libaio-devel rpcgen libtirpc-devel perl python-devel cyrus-sasl-devel libuuid-devel;
+    for packages in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget crontabs libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-devel libaio-devel rpcgen libtirpc-devel perl python-devel cyrus-sasl-devel;
     do yum -y install $packages; done
 
     if [ -s /etc/yum.conf.lnmp ]; then
@@ -279,43 +258,26 @@ Check_Download()
         Download_Files ${Download_Mirror}/lib/tcmalloc/${TCMalloc_Ver}.tar.gz ${TCMalloc_Ver}.tar.gz
         Download_Files ${Download_Mirror}/lib/libunwind/${Libunwind_Ver}.tar.gz ${Libunwind_Ver}.tar.gz
     fi
-
-   if [ "${Stack}" != "lamp" ]; then
-   Download_Files http://nginx.org/download/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
-   fi
-   if [[ "${DBSelect}" =~ ^[12345]$ ]]; then
-	    mysql_short_version=`echo ${Mysql_Ver} | cut -d. -f1-2|cut -d- -f2-2`
-        Download_Files http://cdn.mysql.com/Downloads/MySQL-${mysql_short_version}/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
+    if [ "${Stack}" != "lamp" ]; then
+        Download_Files ${Download_Mirror}/web/nginx/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
+    fi
+    if [[ "${DBSelect}" =~ ^[12345]$ ]]; then
+        Download_Files ${Download_Mirror}/datebase/mysql/${Mysql_Ver}.tar.gz ${Mysql_Ver}.tar.gz
     elif [[ "${DBSelect}" =~ ^[6789]|10$ ]]; then
         Download_Files ${Download_Mirror}/datebase/mariadb/${Mariadb_Ver}.tar.gz ${Mariadb_Ver}.tar.gz
     fi
-    Download_Files http://php.net/distributions/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
+    Download_Files ${Download_Mirror}/web/php/${Php_Ver}.tar.bz2 ${Php_Ver}.tar.bz2
     if [ ${PHPSelect} = "1" ]; then
         Download_Files ${Download_Mirror}/web/phpfpm/${Php_Ver}-fpm-0.5.14.diff.gz ${Php_Ver}-fpm-0.5.14.diff.gz
     fi
-    #Download_Files ${Download_Mirror}/datebase/phpmyadmin/${PhpMyAdmin_Ver}.tar.xz ${PhpMyAdmin_Ver}.tar.xz
-    phpm_short_version=`echo ${PhpMyAdmin_Ver}| cut -d. -f1-3|cut -d- -f2-2`
-    Download_Files https://files.phpmyadmin.net/phpMyAdmin/${phpm_short_version}/${PhpMyAdmin_Ver}.tar.xz ${PhpMyAdmin_Ver}.tar.xz
+    Download_Files ${Download_Mirror}/datebase/phpmyadmin/${PhpMyAdmin_Ver}.tar.xz ${PhpMyAdmin_Ver}.tar.xz
     Download_Files ${Download_Mirror}/prober/p.tar.gz p.tar.gz
     if [ "${Stack}" != "lnmp" ]; then
         Download_Files ${Download_Mirror}/web/apache/${Apache_Ver}.tar.bz2 ${Apache_Ver}.tar.bz2
         Download_Files ${Download_Mirror}/web/apache/${APR_Ver}.tar.bz2 ${APR_Ver}.tar.bz2
         Download_Files ${Download_Mirror}/web/apache/${APR_Util_Ver}.tar.bz2 ${APR_Util_Ver}.tar.bz2
     fi
-    Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
-
-     _openssl_version=`/usr/local/ssl/bin/openssl version |awk {'print $2'} `
-     _openssl_short_ver=`echo ${Openssl_Ver} |awk -F '-' '{print $2}'`
-
-     if [ $_openssl_version"x" != $_openssl_short_ver"x" ]
-     then
-     Download_Files https://www.openssl.org/source/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
-     Tar_Cd ${Openssl_Ver}.tar.gz ${Openssl_Ver}
-     ./Configure --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
-     ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl
-     make && make install
-     cd ${cur_dir}/src
-     fi
+    Download_Files ${Download_Mirror}/lib/openssl/${Openssl_Ver}.tar.gz ${Openssl_Ver}.tar.gz
 }
 
 Make_Install()
@@ -560,6 +522,7 @@ Install_Openssl_New()
         ln -sf /usr/local/openssl/lib/libssl.so.1.1 /usr/lib/
         cd ${cur_dir}/src/
         rm -rf ${cur_dir}/src/${Openssl_New_Ver}
+        ldconfig
 }
 
 Install_Nghttp2()
@@ -681,5 +644,30 @@ Remove_Error_Libcurl()
 {
     if [ -s /usr/local/lib/libcurl.so ]; then
         rm -f /usr/local/lib/libcurl*
+    fi
+}
+
+Add_Swap()
+{
+    Swap_Total=$(free -m | grep Swap | awk '{print  $2}')
+    if [[ "${Enable_Swap}" = "y" && "${Swap_Total}" = "0" ]]; then
+        echo "Add Swap file..."
+        if [ "${MemTotal}" -lt 1024 ]; then
+            DD_Count='1024'
+        elif [[ "${MemTotal}" -ge 1024 && "${MemTotal}" -le 2048 ]]; then
+            DD_Count='2028'
+        fi
+        dd if=/dev/zero of=/var/swapfile bs=1M count=${DD_Count}
+        chmod 0600 /var/swapfile
+        echo "Enable Swap..."
+        /sbin/mkswap /var/swapfile
+        /sbin/swapon /var/swapfile
+        if [ $? -eq 0 ]; then
+            [ `grep -L '/var/swapfile'    '/etc/fstab'` ] && echo "/var/swapfile swap swap defaults 0 0" >>/etc/fstab
+            /sbin/swapon -s
+        else
+            rm -f /var/swapfile
+            echo "Add Swap Failed!"
+        fi
     fi
 }
