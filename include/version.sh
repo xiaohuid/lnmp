@@ -17,7 +17,7 @@ Boost_Ver='boost_1_59_0'
 Boost_New_Ver='boost_1_67_0'
 Openssl_Ver='openssl-1.0.2r'
 Openssl_New_Ver='openssl-1.1.1b'
-Nghttp2_Ver='nghttp2-1.35.1'
+Nghttp2_Ver='nghttp2-1.36.0'
 Luajit_Ver='LuaJIT-2.0.5'
 LuaNginxModule='lua-nginx-module-0.10.13'
 NgxDevelKit='ngx_devel_kit-0.3.0'
@@ -65,14 +65,14 @@ fi
 if [[ "${PHPSelect}" =~ ^[123]$ ]]; then
     PhpMyAdmin_Ver='phpMyAdmin-4.0.10.20-all-languages'
 else
-    PhpMyAdmin_Ver='phpMyAdmin-4.8.4-all-languages'
+    PhpMyAdmin_Ver='phpMyAdmin-4.8.5-all-languages'
 fi
 APR_Ver='apr-1.6.5'
 APR_Util_Ver='apr-util-1.6.1'
 if [ "${ApacheSelect}" = "1" ]; then
     Apache_Ver='httpd-2.2.34'
 elif [ "${ApacheSelect}" = "2" ]; then
-    Apache_Ver='httpd-2.4.37'
+    Apache_Ver='httpd-2.4.38'
 fi
 
 Pureftpd_Ver='pure-ftpd-1.0.47'
@@ -89,5 +89,5 @@ PHPMemcached_Ver='memcached-2.2.0'
 PHP7Memcached_Ver='memcached-3.1.3'
 PHPMemcache_Ver='memcache-3.0.8'
 PHPOldApcu_Ver='apcu-4.0.11'
-PHPNewApcu_Ver='apcu-5.1.16'
+PHPNewApcu_Ver='apcu-5.1.17'
 PHPApcu_Bc_Ver='apcu_bc-1.0.4'
