@@ -17,7 +17,7 @@ LNMP一键安装包是一个用Linux Shell编写的可以为CentOS/RHEL/Fedora/A
 
 安装前确认已经安装wget命令，如提示wget: command not found ，使用`yum install wget` 或 `apt-get install wget` 命令安装。
 为防止掉线等情况，建议使用screen，可以先执行：screen -S lnmp 命令后，再执行LNMP安装命令：
-`wget http://soft.vpser.net/lnmp/lnmp1.6beta.tar.gz -cO lnmp1.6beta.tar.gz && tar zxf lnmp1.6beta.tar.gz && cd lnmp1.6 && ./install.sh {lnmp|lnmpa|lamp}`
+`wget http://soft.vpser.net/lnmp/lnmp1.6.tar.gz -cO lnmp1.6.tar.gz && tar zxf lnmp1.6.tar.gz && cd lnmp1.6 && ./install.sh {lnmp|lnmpa|lamp}`
 
 如断线可使用`screen -r lnmp` 恢复。**详细安装教程参考：<https://lnmp.org/install.html>**
 
@@ -85,6 +85,8 @@ PHPSelect | PHP版本序号
 SelectMalloc | 内存分配器版本序号
 ApacheSelect | Apache版本序号，仅LNMPA和LAMP模式需添加该参数
 ServerAdmin | 管理员邮箱，仅LNMPA和LAMP模式需添加该参数
+RHELRepo | (非必选)设为 local 时，RHEL使用本地源，不设置源为163 centos源
+CheckMirror | (非必选)安装时不检查下载镜像，方便无网络安装
 
 * 各程序版本对应序号
 

@@ -2,7 +2,7 @@
 
 MariaDB_WITHSSL()
 {
-    if /usr/bin/openssl version | grep -Eqi "OpenSSL 1.1.*"; then
+    if openssl version | grep -Eqi "OpenSSL 1.1.*"; then
         if [[ "${DBSelect}" =~ ^[78]$ ]] || echo "${mariadb_version}" | grep -Eqi '^10.[01].'; then
             Install_Openssl
             MariaDBWITHSSL='-DWITH_SSL=/usr/local/openssl'
@@ -24,7 +24,7 @@ EOF
         ulimit -s unlimited
     fi
     
-    if [ -s /bin/systemctl ]; then
+    if command -v systemctl >/dev/null 2>&1; then
         systemctl enable mariadb.service
     fi
     StartUp mariadb

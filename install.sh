@@ -62,7 +62,9 @@ Init_Install()
     Get_Dist_Version
     Print_Sys_Info
     Check_Hosts
-    Check_Mirror
+    if [ "${CheckMirror}" != "n" ]; then
+        Check_Mirror
+    fi
     if [ "${DISTRO}" = "RHEL" ]; then
         RHEL_Modify_Source
     fi
@@ -123,6 +125,7 @@ Init_Install()
         Install_MariaDB_103
     fi
     TempMycnf_Clean
+    Clean_DB_Src_Dir
     Check_PHP_Option
 }
 
@@ -147,6 +150,7 @@ Install_PHP()
     elif [ "${PHPSelect}" = "9" ]; then
         Install_PHP_73
     fi
+    Clean_PHP_Src_Dir
 }
 
 LNMP_Stack()

@@ -497,7 +497,7 @@ EOF
     chmod 644 ${vhostdir}/.user.ini
     chattr +i ${vhostdir}/.user.ini
 
-    /etc/init.d/php-fpm restart
+    /etc/init.d/php-fpm reload
 
     if [ "${create_database}" == "y" ]; then
         Add_Database
@@ -1395,6 +1395,7 @@ case "${arg1}" in
         echo "Usage: lnmp ftp {add|list|edit|del|show}"
         echo "Usage: lnmp ssl add"
         echo "Usage: lnmp {dnsssl|dns} {cx|ali|cf|dp|he|gd|aws}"
+        echo "Usage: lnmp onlyssl {cx|ali|cf|dp|he|gd|aws}"
         ;;
 esac
 exit
