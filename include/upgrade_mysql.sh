@@ -4,7 +4,7 @@ Backup_MySQL()
 {
     echo "Starting backup all databases..."
     echo "If the database is large, the backup time will be longer."
-    /usr/local/mysql/bin/mysqldump --defaults-file=~/.my.cnf --all-databases > /root/mysql_all_backup${Upgrade_Date}.sql
+    /usr/local/mysql/bin/mysqldump --defaults-file=/etc/my.cnf --all-databases > /root/mysql_all_backup${Upgrade_Date}.sql
     if [ $? -eq 0 ]; then
         echo "MySQL databases backup successfully.";
     else
