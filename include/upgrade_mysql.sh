@@ -78,14 +78,14 @@ default_storage_engine = InnoDB
 #innodb_log_group_home_dir = ${MySQL_Data_Dir}
 #innodb_buffer_pool_size = 16M
 #innodb_additional_mem_pool_size = 2M
-#innodb_log_file_size = 64M
+#innodb_log_file_size = 128M
 #innodb_log_buffer_size = 8M
 #innodb_flush_log_at_trx_commit = 1
 #innodb_lock_wait_timeout = 50
 
 [mysqldump]
 quick
-max_allowed_packet = 16M
+max_allowed_packet = 64M
 
 [mysql]
 no-auto-rehash
@@ -175,14 +175,14 @@ default_storage_engine = InnoDB
 #innodb_log_group_home_dir = ${MySQL_Data_Dir}
 #innodb_buffer_pool_size = 16M
 #innodb_additional_mem_pool_size = 2M
-#innodb_log_file_size = 64M
+#innodb_log_file_size = 128M
 #innodb_log_buffer_size = 8M
 #innodb_flush_log_at_trx_commit = 1
 #innodb_lock_wait_timeout = 50
 
 [mysqldump]
 quick
-max_allowed_packet = 16M
+max_allowed_packet = 64M
 
 [mysql]
 no-auto-rehash
@@ -300,14 +300,14 @@ default_storage_engine = InnoDB
 #innodb_data_file_path = ibdata1:10M:autoextend
 #innodb_log_group_home_dir = ${MySQL_Data_Dir}
 #innodb_buffer_pool_size = 16M
-#innodb_log_file_size = 64M
+#innodb_log_file_size = 128M
 #innodb_log_buffer_size = 8M
 #innodb_flush_log_at_trx_commit = 1
 #innodb_lock_wait_timeout = 50
 
 [mysqldump]
 quick
-max_allowed_packet = 16M
+max_allowed_packet = 64M
 
 [mysql]
 no-auto-rehash
@@ -402,14 +402,14 @@ innodb_data_home_dir = ${MySQL_Data_Dir}
 innodb_data_file_path = ibdata1:10M:autoextend
 innodb_log_group_home_dir = ${MySQL_Data_Dir}
 innodb_buffer_pool_size = 16M
-innodb_log_file_size = 64M
+innodb_log_file_size = 128M
 innodb_log_buffer_size = 8M
 innodb_flush_log_at_trx_commit = 1
 innodb_lock_wait_timeout = 50
 
 [mysqldump]
 quick
-max_allowed_packet = 16M
+max_allowed_packet = 64M
 
 [mysql]
 no-auto-rehash
@@ -498,14 +498,14 @@ innodb_data_home_dir = ${MySQL_Data_Dir}
 innodb_data_file_path = ibdata1:10M:autoextend
 innodb_log_group_home_dir = ${MySQL_Data_Dir}
 innodb_buffer_pool_size = 16M
-innodb_log_file_size = 64M
+innodb_log_file_size = 128M
 innodb_log_buffer_size = 8M
 innodb_flush_log_at_trx_commit = 1
 innodb_lock_wait_timeout = 50
 
 [mysqldump]
 quick
-max_allowed_packet = 16M
+max_allowed_packet = 64M
 
 [mysql]
 no-auto-rehash
