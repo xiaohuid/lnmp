@@ -16,7 +16,7 @@ else
     Stack=$1
 fi
 
-LNMP_Ver='1.6'
+LNMP_Ver='1.7'
 . lnmp.conf
 . include/main.sh
 . include/init.sh
@@ -62,7 +62,9 @@ Init_Install()
     Get_Dist_Version
     Print_Sys_Info
     Check_Hosts
-    Check_Mirror
+    if [ "${CheckMirror}" != "n" ]; then
+        Check_Mirror
+    fi
     if [ "${DISTRO}" = "RHEL" ]; then
         RHEL_Modify_Source
     fi
@@ -114,15 +116,16 @@ Init_Install()
     elif [ "${DBSelect}" = "6" ]; then
         Install_MariaDB_5
     elif [ "${DBSelect}" = "7" ]; then
-        Install_MariaDB_10
-    elif [ "${DBSelect}" = "8" ]; then
         Install_MariaDB_101
-    elif [ "${DBSelect}" = "9" ]; then
+    elif [ "${DBSelect}" = "8" ]; then
         Install_MariaDB_102
-    elif [ "${DBSelect}" = "10" ]; then
+    elif [ "${DBSelect}" = "9" ]; then
         Install_MariaDB_103
+    elif [ "${DBSelect}" = "10" ]; then
+        Install_MariaDB_104
     fi
     TempMycnf_Clean
+    Clean_DB_Src_Dir
     Check_PHP_Option
 }
 
@@ -146,7 +149,10 @@ Install_PHP()
         Install_PHP_72
     elif [ "${PHPSelect}" = "9" ]; then
         Install_PHP_73
+    elif [ "${PHPSelect}" = "10" ]; then
+        Install_PHP_74
     fi
+    Clean_PHP_Src_Dir
 }
 
 LNMP_Stack()

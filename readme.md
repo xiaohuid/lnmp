@@ -1,3 +1,5 @@
+**当前为1.7测试版**
+
 # LNMP一键安装包 - Readme
 
 ## LNMP一键安装包是什么?
@@ -17,7 +19,7 @@ LNMP一键安装包是一个用Linux Shell编写的可以为CentOS/RHEL/Fedora/A
 
 安装前确认已经安装wget命令，如提示wget: command not found ，使用`yum install wget` 或 `apt-get install wget` 命令安装。
 为防止掉线等情况，建议使用screen，可以先执行：screen -S lnmp 命令后，再执行LNMP安装命令：
-`wget http://soft.vpser.net/lnmp/lnmp1.6beta.tar.gz -cO lnmp1.6beta.tar.gz && tar zxf lnmp1.6beta.tar.gz && cd lnmp1.6 && ./install.sh {lnmp|lnmpa|lamp}`
+`wget http://soft.vpser.net/lnmp/lnmp1.6.tar.gz -cO lnmp1.6.tar.gz && tar zxf lnmp1.6.tar.gz && cd lnmp1.6 && ./install.sh {lnmp|lnmpa|lamp}`
 
 如断线可使用`screen -r lnmp` 恢复。**详细安装教程参考：<https://lnmp.org/install.html>**
 
@@ -41,6 +43,7 @@ lnmp.conf配置文件，可以修改lnmp.conf自定义下载服务器地址、�
 * 参数: php   仅适用于LNMP，可升级至大部分PHP版本。
 * 参数: phpa    可升级LNMPA/LAMP的PHP至大部分版本。
 * 参数: phpmyadmin    可升级phpMyadmin。
+* 参数: mphp    同版本内升级多PHP版本。
 
 ### 扩展插件
 执行: `./addons.sh {install|uninstall} {eaccelerator|xcache|memcached|opcache|redis|apcu|imagemagick|ioncube}`
@@ -85,6 +88,8 @@ PHPSelect | PHP版本序号
 SelectMalloc | 内存分配器版本序号
 ApacheSelect | Apache版本序号，仅LNMPA和LAMP模式需添加该参数
 ServerAdmin | 管理员邮箱，仅LNMPA和LAMP模式需添加该参数
+RHELRepo | (非必选)设为 local 时，RHEL使用本地源，不设置源为163 centos源
+CheckMirror | (非必选)安装时不检查下载镜像，方便无网络安装
 
 * 各程序版本对应序号
 
@@ -96,15 +101,15 @@ MySQL 5.6 | 3 | PHP 5.4 | 3 | TCMalloc | 3 | |
 MySQL 5.7 | 4 | PHP 5.5 | 4 | | | |
 MySQL 8.0 | 5 | PHP 5.6 | 5 | | | |
 MariaDB 5.5 | 6 | PHP 7.0 | 6 | | | |
-MariaDB 10.0 | 7 | PHP 7.1 | 7 | | | |
-MariaDB 10.1 | 8 | PHP 7.2 | 8 | | | |
-MariaDB 10.2 | 9 | PHP 7.3 | | | | |
-MariaDB 10.3 | 10 | | | | | |
+MariaDB 10.1 | 7 | PHP 7.1 | 7 | | | |
+MariaDB 10.2 | 8 | PHP 7.2 | 8 | | | |
+MariaDB 10.3 | 9 | PHP 7.3 | 9 | | | |
+MariaDB 10.4 | 10 | PHP 7.4 | 10 | | | |
 不安装数据库 | 0 | | | | | |
 
 * 以LNMP模式，默认选项安装MySQL 5.5、MySQL root密码设置为lnmp.org、启用InnoDB、PHP 5.6、不安装内存分配器为例，先执行([建议先运行screen](https://www.vpser.net/manage/run-screen-lnmp.html))，再下载解压lnmp安装包：
 
-`wget http://soft.vpser.net/lnmp/lnmp1.6beta.tar.gz -cO lnmp1.6beta.tar.gz && tar zxf lnmp1.6beta.tar.gz && cd lnmp1.6`
+`wget http://soft.vpser.net/lnmp/lnmp1.7beta.tar.gz -cO lnmp1.7beta.tar.gz && tar zxf lnmp1.7beta.tar.gz && cd lnmp1.7`
 
 然后设置无人值守参数并安装：
 
@@ -175,6 +180,7 @@ MariaDB 10.3 | 10 | | | | | |
 |Enable_Nginx_Openssl|Nginx是否使用新版openssl|默认 y，建议不修改，y是启用并开启到http2|
 |Enable_PHP_Fileinfo|是否安装开启php的fileinfo模块|默认n，根据自己情况而定，安装启用的话改成 y|
 |Enable_Nginx_Lua|是否为Nginx安装lua支持|默认n，安装lua可以使用一些基于lua的waf网站防火墙|
+|Enable_Swap|是否添加SWAP|默认y，当内存不足时可提高编译安装成功概率|
 
 ## 技术支持
 

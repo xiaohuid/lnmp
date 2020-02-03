@@ -5,12 +5,11 @@ Install_PHPMemcache()
     echo "Install memcache php extension..."
     cd ${cur_dir}/src
     if echo "${Cur_PHP_Version}" | grep -Eqi '^7.';then
-        rm -rf pecl-memcache
-        git clone https://github.com/websupport-sk/pecl-memcache.git
-        cd pecl-memcache
+        Download_Files ${Download_Mirror}/web/memcache/${PHP7Memcache_Ver}.tgz ${PHP7Memcache_Ver}.tgz
+        Tar_Cd ${PHP7Memcache_Ver}.tgz ${PHP7Memcache_Ver}
     else
-        Download_Files ${Download_Mirror}/web/memcache/${PHPMemcache_Ver}.tgz ${PHPMemcache_Ver}.tgz
-        Tar_Cd ${PHPMemcache_Ver}.tgz ${PHPMemcache_Ver}
+        Download_Files ${Download_Mirror}/web/memcache/${PHP7Memcache_Ver}.tgz ${PHP7Memcache_Ver}.tgz
+        Tar_Cd ${PHP7Memcache_Ver}.tgz ${PHP7Memcache_Ver}
     fi
     ${PHP_Path}/bin/phpize
     ./configure --with-php-config=${PHP_Path}/bin/php-config
@@ -26,7 +25,7 @@ Install_PHPMemcached()
     if [ "$PM" = "yum" ]; then
         yum install cyrus-sasl-devel -y
         Get_Dist_Version
-        if echo "${CentOS_Version}" | grep -Eqi '^5.'; then
+        if echo "${CentOS_Version}" | grep -Eqi '^5'; then
             yum install gcc44 gcc44-c++ libstdc++44-devel -y
             export CC="gcc44"
             export CXX="g++44"
@@ -127,14 +126,21 @@ EOF
 
     Restart_PHP
 
-    if [ -s /sbin/iptables ]; then
-        if /sbin/iptables -C INPUT -i lo -j ACCEPT; then
-            /sbin/iptables -A INPUT -p tcp --dport 11211 -j DROP
-            /sbin/iptables -A INPUT -p udp --dport 11211 -j DROP
+    if command -v iptables >/dev/null 2>&1; then
+        if iptables -C INPUT -i lo -j ACCEPT; then
+            iptables -A INPUT -p tcp --dport 11211 -j DROP
+            iptables -A INPUT -p udp --dport 11211 -j DROP
             if [ "$PM" = "yum" ]; then
                 service iptables save
+                service iptables reload
             elif [ "$PM" = "apt" ]; then
-                iptables-save > /etc/iptables.rules
+                if [ -s /etc/init.d/netfilter-persistent ]; then
+                    /etc/init.d/netfilter-persistent save
+                    /etc/init.d/netfilter-persistent reload
+                else
+                    /etc/init.d/iptables-persistent save
+                    /etc/init.d/iptables-persistent reload
+                fi
             fi
         fi
     fi
@@ -163,13 +169,20 @@ Uninstall_Memcached()
     rm -rf /usr/local/memcached
     rm -rf /etc/init.d/memcached
     rm -rf /usr/bin/memcached
-    if [ -s /sbin/iptables ]; then
-        /sbin/iptables -D INPUT -p tcp --dport 11211 -j DROP
-        /sbin/iptables -D INPUT -p udp --dport 11211 -j DROP
+    if command -v iptables >/dev/null 2>&1; then
+        iptables -D INPUT -p tcp --dport 11211 -j DROP
+        iptables -D INPUT -p udp --dport 11211 -j DROP
         if [ "$PM" = "yum" ]; then
             service iptables save
+            service iptables reload
         elif [ "$PM" = "apt" ]; then
-            iptables-save > /etc/iptables.rules
+            if [ -s /etc/init.d/netfilter-persistent ]; then
+                /etc/init.d/netfilter-persistent save
+                /etc/init.d/netfilter-persistent reload
+            else
+                /etc/init.d/iptables-persistent save
+                /etc/init.d/iptables-persistent reload
+            fi
         fi
     fi
     Echo_Green "Uninstall Memcached completed."

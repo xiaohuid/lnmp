@@ -34,7 +34,6 @@ Upgrade_MySQL51()
     fi
     sed -i '/set -ex;/,/done/d' Makefile
     Make_Install
-    cd ../
 
     groupadd mysql
     useradd -s /sbin/nologin -M -g mysql mysql
@@ -353,7 +352,7 @@ EOF
 Upgrade_MySQL57()
 {
     echo "Starting upgrade MySQL..."
-    Tar_Cd mysql-${mysql_version}.tar.gz mysql-${mysql_version}
+    Tar_Cd ${mysql_src} mysql-${mysql_version}
     Install_Boost
     cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DSYSCONFDIR=/etc -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DWITH_FEDERATED_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8mb4 -DDEFAULT_COLLATION=utf8mb4_general_ci -DWITH_EMBEDDED_SERVER=1 -DENABLED_LOCAL_INFILE=1 ${MySQL_WITH_BOOST}
     Make_Install
@@ -417,8 +416,8 @@ no-auto-rehash
 [myisamchk]
 key_buffer_size = 20M
 sort_buffer_size = 20M
-read_buffer = 2M
-write_buffer = 2M
+read_buffer_size = 2M
+write_buffer_size = 2M
 
 [mysqlhotcopy]
 interactive-timeout
@@ -448,9 +447,10 @@ EOF
 Upgrade_MySQL80()
 {
     echo "Starting upgrade MySQL..."
-    Tar_Cd mysql-${mysql_version}.tar.gz mysql-${mysql_version}
+    Tar_Cd ${mysql_src} mysql-${mysql_version}
     Install_Boost
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DSYSCONFDIR=/etc -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DWITH_FEDERATED_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8mb4 -DDEFAULT_COLLATION=utf8mb4_general_ci -DWITH_EMBEDDED_SERVER=1 -DENABLED_LOCAL_INFILE=1 ${MySQL_WITH_BOOST}
+    mkdir build && cd build
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DSYSCONFDIR=/etc -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DWITH_FEDERATED_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8mb4 -DDEFAULT_COLLATION=utf8mb4_general_ci -DWITH_EMBEDDED_SERVER=1 -DENABLED_LOCAL_INFILE=1 ${MySQL_WITH_BOOST}
     Make_Install
 
     groupadd mysql
@@ -512,8 +512,8 @@ no-auto-rehash
 [myisamchk]
 key_buffer_size = 20M
 sort_buffer_size = 20M
-read_buffer = 2M
-write_buffer = 2M
+read_buffer_size = 2M
+write_buffer_size = 2M
 
 [mysqlhotcopy]
 interactive-timeout
@@ -543,7 +543,7 @@ EOF
 Restore_Start_MySQL()
 {
     chgrp -R mysql /usr/local/mysql/.
-    \cp ${cur_dir}/src/mysql-${mysql_version}/support-files/mysql.server /etc/init.d/mysql
+    \cp support-files/mysql.server /etc/init.d/mysql
     chmod 755 /etc/init.d/mysql
 
     ldconfig
@@ -639,26 +639,34 @@ Upgrade_MySQL()
 
     echo "============================check files=================================="
     cd ${cur_dir}/src
-    if [ -s mysql-${mysql_version}.tar.gz ]; then
-        echo "mysql-${mysql_version}.tar.gz [found]"
+    if [[ "${mysql_short_version}" = "5.7" || "${mysql_short_version}" = "8.0" ]]; then
+        mysql_src="mysql-boost-${mysql_version}.tar.gz"
     else
-        echo "Notice: mysql-${mysql_version}.tar.gz not found!!!download now......"
+        mysql_src="mysql-${mysql_version}.tar.gz"
+    fi
+    if [ -s "${mysql_src}" ]; then
+        echo "${mysql_src} [found]"
+    else
+        echo "Notice: ${mysql_src} not found!!!download now......"
         country=`curl -sSk --connect-timeout 10 -m 60 https://ip.vpser.net/country`
         if [ "${country}" = "CN" ]; then
-            wget -c --progress=bar:force http://mirrors.ustc.edu.cn/mysql-ftp/Downloads/MySQL-${mysql_short_version}/mysql-${mysql_version}.tar.gz
+            wget -c --progress=bar:force http://mirrors.ustc.edu.cn/mysql-ftp/Downloads/MySQL-${mysql_short_version}/${mysql_src}
             if [ $? -ne 0 ]; then
-                wget -c --progress=bar:force http://cdn.mysql.com/Downloads/MySQL-${mysql_short_version}/mysql-${mysql_version}.tar.gz
+                wget -c --progress=bar:force http://cdn.mysql.com/Downloads/MySQL-${mysql_short_version}/${mysql_src}
             fi
         else
-            wget -c --progress=bar:force http://cdn.mysql.com/Downloads/MySQL-${mysql_short_version}/mysql-${mysql_version}.tar.gz
+            wget -c --progress=bar:force http://cdn.mysql.com/Downloads/MySQL-${mysql_short_version}/${mysql_src}
         fi
         if [ $? -eq 0 ]; then
-            echo "Download mysql-${mysql_version}.tar.gz successfully!"
+            echo "Download ${mysql_src} successfully!"
         else
-            echo "You enter MySQL Version was:"${mysql_version}
-            Echo_Red "Error! You entered a wrong version number, please check!"
-            sleep 5
-            exit 1
+            wget -c --progress=bar:force https://cdn.mysql.com/archives/MySQL-${mysql_short_version}/${mysql_src}
+            if [ $? -ne 0 ]; then
+                echo "You enter MySQL Version was: ${mysql_version}"
+                Echo_Red "Error! You entered a wrong version number, please check!"
+                sleep 5
+                exit 1
+            fi
         fi
     fi
     echo "============================check files=================================="

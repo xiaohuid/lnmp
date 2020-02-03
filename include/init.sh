@@ -105,11 +105,16 @@ Check_Hosts()
 RHEL_Modify_Source()
 {
     Get_RHEL_Version
-    \cp ${cur_dir}/conf/CentOS-Base-163.repo /etc/yum.repos.d/CentOS-Base-163.repo
-    sed -i "s/\$releasever/${RHEL_Ver}/g" /etc/yum.repos.d/CentOS-Base-163.repo
-    sed -i "s/RPM-GPG-KEY-CentOS-6/RPM-GPG-KEY-CentOS-${RHEL_Ver}/g" /etc/yum.repos.d/CentOS-Base-163.repo
-    yum clean all
-    yum makecache
+    if [ "${RHELRepo}" = "local" ]; then
+        echo "DO NOT change RHEL repository, use the repository you set."
+    else
+        echo "RHEL will use 163 centos repository..."
+        \cp ${cur_dir}/conf/CentOS-Base-163.repo /etc/yum.repos.d/CentOS-Base-163.repo
+        sed -i "s/\$releasever/${RHEL_Ver}/g" /etc/yum.repos.d/CentOS-Base-163.repo
+        sed -i "s/RPM-GPG-KEY-CentOS-6/RPM-GPG-KEY-CentOS-${RHEL_Ver}/g" /etc/yum.repos.d/CentOS-Base-163.repo
+        yum clean all
+        yum makecache
+    fi
 }
 
 Ubuntu_Modify_Source()
@@ -154,6 +159,8 @@ Ubuntu_Modify_Source()
         Ubuntu_Deadline xenial
     elif grep -Eqi "18.10" /etc/*-release || echo "${Ubuntu_Version}" | grep -Eqi '^18.10'; then
         Ubuntu_Deadline cosmic
+    elif grep -Eqi "19.04" /etc/*-release || echo "${Ubuntu_Version}" | grep -Eqi '^19.04'; then
+        Ubuntu_Deadline disco
     fi
     if [ "${CodeName}" != "" ]; then
         \cp /etc/apt/sources.list /etc/apt/sources.list.$(date +"%Y%m%d")
@@ -187,6 +194,7 @@ Ubuntu_Deadline()
     artful_deadline=`date -d "2018-7-31 00:00:00" +%s`
     xenial_deadline=`date -d "2021-4-30 00:00:00" +%s`
     cosmic_deadline=`date -d "2019-7-30 00:00:00" +%s`
+    disco_deadline=`date -d "2020-1-30 00:00:00" +%s`
     cur_time=`date  +%s`
     case "$1" in
         trusty)
@@ -213,6 +221,12 @@ Ubuntu_Deadline()
                 Check_Old_Releases_URL cosmic
             fi
             ;;
+        disco)
+            if [ ${cur_time} -gt ${disco_deadline} ]; then
+                echo "${cur_time} > ${disco_deadline}"
+                Check_Old_Releases_URL disco
+            fi
+            ;;
     esac
 }
 
@@ -224,8 +238,24 @@ CentOS_Dependent()
     fi
 
     Echo_Blue "[+] Yum installing dependent packages..."
-    for packages in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget crontabs libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-devel libaio-devel rpcgen libtirpc-devel perl python-devel cyrus-sasl-devel;
+    for packages in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf patch wget crontabs libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel unzip tar bzip2 bzip2-devel libzip-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel xz expat-devel libaio-devel rpcgen libtirpc-devel perl python-devel cyrus-sasl-devel sqlite-devel oniguruma-devel;
     do yum -y install $packages; done
+
+    yum -y update nss
+
+    if [ "${DISTRO}" = "CentOS" ] && echo "${CentOS_Version}" | grep -Eqi "^8"; then
+        dnf --enablerepo=PowerTools install rpcgen -y
+        dnf --enablerepo=PowerTools install oniguruma-devel -y
+    fi
+
+    if [ "${DISTRO}" = "CentOS" ] && echo "${CentOS_Version}" | grep -Eqi "^7"; then
+        yum -y install https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/o/oniguruma-5.9.5-3.el7.x86_64.rpm
+        yum -y install https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/o/oniguruma-devel-5.9.5-3.el7.x86_64.rpm
+    fi
+
+    if [ "${DISTRO}" = "Fedora" ]; then
+        dnf install chkconfig -y
+    fi
 
     if [ -s /etc/yum.conf.lnmp ]; then
         mv -f /etc/yum.conf.lnmp /etc/yum.conf
@@ -240,7 +270,7 @@ Deb_Dependent()
     apt-get -fy install
     export DEBIAN_FRONTEND=noninteractive
     apt-get --no-install-recommends install -y build-essential gcc g++ make
-    for packages in debian-keyring debian-archive-keyring build-essential gcc g++ make cmake autoconf automake re2c wget cron bzip2 libzip-dev libc6-dev bison file rcconf flex vim bison m4 gawk less cpp binutils diffutils unzip tar bzip2 libbz2-dev libncurses5 libncurses5-dev libtool libevent-dev openssl libssl-dev zlibc libsasl2-dev libltdl3-dev libltdl-dev zlib1g zlib1g-dev libbz2-1.0 libbz2-dev libglib2.0-0 libglib2.0-dev libpng3 libjpeg-dev libpng-dev libpng12-0 libpng12-dev libkrb5-dev curl libcurl3-gnutls libcurl4-gnutls-dev libcurl4-openssl-dev libpq-dev libpq5 gettext libpng12-dev libxml2-dev libcap-dev ca-certificates libc-client2007e-dev psmisc patch git libc-ares-dev libicu-dev e2fsprogs libxslt libxslt1-dev libc-client-dev xz-utils libexpat1-dev libaio-dev libtirpc-dev python-dev;
+    for packages in debian-keyring debian-archive-keyring build-essential gcc g++ make cmake autoconf automake re2c wget cron bzip2 libzip-dev libc6-dev bison file rcconf flex vim bison m4 gawk less cpp binutils diffutils unzip tar bzip2 libbz2-dev libncurses5 libncurses5-dev libtool libevent-dev openssl libssl-dev zlibc libsasl2-dev libltdl3-dev libltdl-dev zlib1g zlib1g-dev libbz2-1.0 libbz2-dev libglib2.0-0 libglib2.0-dev libpng3 libjpeg-dev libpng-dev libpng12-0 libpng12-dev libkrb5-dev curl libcurl3-gnutls libcurl4-gnutls-dev libcurl4-openssl-dev libpq-dev libpq5 gettext libpng12-dev libxml2-dev libcap-dev ca-certificates libc-client2007e-dev psmisc patch git libc-ares-dev libicu-dev e2fsprogs libxslt libxslt1-dev libc-client-dev xz-utils libexpat1-dev libaio-dev libtirpc-dev python-dev libsqlite3-dev libonig-dev;
     do apt-get --no-install-recommends install -y $packages; done
 }
 
@@ -367,7 +397,7 @@ Install_Mhash()
 
 Install_Freetype()
 {
-    if echo "${Ubuntu_Version}" | grep -Eqi "1[89]\." || echo "${Mint_Version}" | grep -Eqi "19\." || echo "${Deepin_Version}" | grep -Eqi "15\.[7-9]" || echo "${Debian_Version}" | grep -Eqi "9\."; then
+    if echo "${Ubuntu_Version}" | grep -Eqi "^1[89]\." || echo "${Mint_Version}" | grep -Eqi "^19\." || echo "${Deepin_Version}" | grep -Eqi "^15\.[7-9]|1[0-9]" || echo "${Debian_Version}" | grep -Eqi "^9|10"; then
         Download_Files ${Download_Mirror}/lib/freetype/${Freetype_New_Ver}.tar.bz2 ${Freetype_New_Ver}.tar.bz2
         Echo_Blue "[+] Installing ${Freetype_New_Ver}"
         Tarj_Cd ${Freetype_New_Ver}.tar.bz2 ${Freetype_New_Ver}
@@ -412,7 +442,7 @@ Install_Curl()
 
 Install_Pcre()
 {
-    if [ ! -s /usr/bin/pcre-config ] || /usr/bin/pcre-config --version | grep -vEqi '^8.'; then
+    if ! command -v pcre-config >/dev/null 2>&1 || pcre-config --version | grep -vEqi '^8.'; then
         Echo_Blue "[+] Installing ${Pcre_Ver}"
         cd ${cur_dir}/src
         Download_Files ${Download_Mirror}/web/pcre/${Pcre_Ver}.tar.bz2 ${Pcre_Ver}.tar.bz2
@@ -462,19 +492,22 @@ Install_TCMalloc()
 
 Install_Icu4c()
 {
-    if [ ! -s /usr/bin/icu-config ] || /usr/bin/icu-config --version | grep '^3.'; then
+    if command -v icu-config >/dev/null 2>&1 && icu-config --version | grep -Eq "^3."; then
         Echo_Blue "[+] Installing ${Libicu4c_Ver}"
         cd ${cur_dir}/src
         Download_Files ${Download_Mirror}/lib/icu4c/${Libicu4c_Ver}-src.tgz ${Libicu4c_Ver}-src.tgz
         Tar_Cd ${Libicu4c_Ver}-src.tgz icu/source
         ./configure --prefix=/usr
+        if [ ! -s /usr/include/xlocale.h ]; then
+            ln -s /usr/include/locale.h /usr/include/xlocale.h
+        fi
         Make_Install
         cd ${cur_dir}/src/
         rm -rf ${cur_dir}/src/icu
     fi
 }
 
-Install_Boost()
+Download_Boost()
 {
     Echo_Blue "[+] Download or use exist boost..."
     if [ "${DBSelect}" = "4" ] || echo "${mysql_version}" | grep -Eqi '^5.7.'; then
@@ -501,6 +534,24 @@ Install_Boost()
     fi
 }
 
+Install_Boost()
+{
+    Echo_Blue "[+] Download or use exist boost..."
+    if [ "${DBSelect}" = "4" ] || [ "${DBSelect}" = "5" ]; then
+        if [ -d "${cur_dir}/src/${Mysql_Ver}/boost" ]; then
+            MySQL_WITH_BOOST="-DWITH_BOOST=${cur_dir}/src/${Mysql_Ver}/boost"
+        else
+            Download_Boost
+        fi
+    elif echo "${mysql_version}" | grep -Eqi '^5.7.' || echo "${mysql_version}" | grep -Eqi '^8.0.'; then
+        if [ -d "${cur_dir}/src/mysql-${mysql_version}/boost" ]; then
+            MySQL_WITH_BOOST="-DWITH_BOOST=${cur_dir}/src/mysql-${mysql_version}/boost"
+        else
+            Download_Boost
+        fi
+    fi
+}
+
 Install_Openssl()
 {
     if [ ! -s /usr/local/openssl/bin/openssl ] || /usr/local/openssl/bin/openssl version | grep -v 'OpenSSL 1.0.2'; then
@@ -519,7 +570,7 @@ Install_Openssl()
 
 Install_Openssl_New()
 {
-    if /usr/bin/openssl version | grep -vEqi "OpenSSL 1.1.1*"; then
+    if openssl version | grep -vEqi "OpenSSL 1.1.1*"; then
         if [ ! -s /usr/local/openssl1.1.1/bin/openssl ] || /usr/local/openssl1.1.1/bin/openssl version | grep -Eqi 'OpenSSL 1.1.1*'; then
             Echo_Blue "[+] Installing ${Openssl_New_Ver}"
             cd ${cur_dir}/src
@@ -593,6 +644,10 @@ CentOS_Lib_Opt()
 eof
 
     echo "fs.file-max=65535" >> /etc/sysctl.conf
+
+    if echo "${Fedora_Version}" | grep -Eqi "3[0-9]" && [ ! -d "/etc/init.d" ]; then
+        ln -sf /etc/rc.d/init.d /etc/init.d
+    fi
 }
 
 Deb_Lib_Opt()
@@ -665,14 +720,42 @@ Remove_Error_Libcurl()
 
 Add_Swap()
 {
-    Swap_Total=$(free -m | grep Swap | awk '{print  $2}')
-    if [[ "${Enable_Swap}" = "y" && "${Swap_Total}" = "0" ]]; then
-        echo "Add Swap file..."
-        if [ "${MemTotal}" -lt 1024 ]; then
-            DD_Count='1024'
-        elif [[ "${MemTotal}" -ge 1024 && "${MemTotal}" -le 2048 ]]; then
-            DD_Count='2028'
+    if command -v python >/dev/null 2>&1; then
+        Disk_Avail=$(${cur_dir}/include/disk.py)
+    elif command -v python3 >/dev/null 2>&1; then
+        Disk_Avail=$(python3 ${cur_dir}/include/disk.py)
+    elif command -v python2 >/dev/null 2>&1; then
+        Disk_Avail=$(python2 ${cur_dir}/include/disk.py)
+    fi
+    if [ "${MemTotal}" -lt 1024 ]; then
+        DD_Count='1024'
+        if [ "${Disk_Avail}" -lt 5 ]; then
+            Enable_Swap='n'
         fi
+    elif [[ "${MemTotal}" -ge 1024 && "${MemTotal}" -le 2048 ]]; then
+        DD_Count='2028'
+        if [ "${Disk_Avail}" -lt 13 ]; then
+            Enable_Swap='n'
+        fi
+    elif [[ "${MemTotal}" -ge 2048 && "${MemTotal}" -le 4096 ]]; then
+        DD_Count='4096'
+        if [ "${Disk_Avail}" -lt 17 ]; then
+            Enable_Swap='n'
+        fi
+    elif [[ "${MemTotal}" -ge 4096 && "${MemTotal}" -le 16384 ]]; then
+        DD_Count='8192'
+        if [ "${Disk_Avail}" -lt 19 ]; then
+            Enable_Swap='n'
+        fi
+    elif [[ "${MemTotal}" -ge 16384 ]]; then
+        DD_Count='8192'
+        if [ "${Disk_Avail}" -lt 27 ]; then
+            Enable_Swap='n'
+        fi
+    fi
+    Swap_Total=$(free -m | grep Swap | awk '{print  $2}')
+    if [[ "${Enable_Swap}" = "y" && "${Swap_Total}" -le 512 && ! -s /var/swapfile ]]; then
+        echo "Add Swap file..."
         dd if=/dev/zero of=/var/swapfile bs=1M count=${DD_Count}
         chmod 0600 /var/swapfile
         echo "Enable Swap..."

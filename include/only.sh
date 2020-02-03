@@ -5,14 +5,14 @@ Nginx_Dependent()
     if [ "$PM" = "yum" ]; then
         rpm -e httpd httpd-tools --nodeps
         yum -y remove httpd*
-        for packages in make gcc gcc-c++ gcc-g77 wget crontabs zlib zlib-devel openssl openssl-devel perl patch;
+        for packages in make gcc gcc-c++ gcc-g77 wget crontabs zlib zlib-devel openssl openssl-devel perl patch bzip2;
         do yum -y install $packages; done
     elif [ "$PM" = "apt" ]; then
         apt-get update -y
         dpkg -P apache2 apache2-doc apache2-mpm-prefork apache2-utils apache2.2-common
         for removepackages in apache2 apache2-doc apache2-utils apache2.2-common apache2.2-bin apache2-mpm-prefork apache2-doc apache2-mpm-worker;
         do apt-get purge -y $removepackages; done
-        for packages in debian-keyring debian-archive-keyring build-essential gcc g++ make autoconf automake wget cron openssl libssl-dev zlib1g zlib1g-dev ;
+        for packages in debian-keyring debian-archive-keyring build-essential gcc g++ make autoconf automake wget cron openssl libssl-dev zlib1g zlib1g-dev bzip2;
         do apt-get --no-install-recommends install -y $packages; done
     fi
 }
@@ -42,6 +42,9 @@ Install_Only_Nginx()
     Download_Files ${Download_Mirror}/web/nginx/${Nginx_Ver}.tar.gz ${Nginx_Ver}.tar.gz
     Install_Nginx
     StartUp nginx
+    rm -rf ${cur_dir}/src/${Nginx_Ver}
+    [[ -d "${cur_dir}/src/${Openssl_Ver}" ]] && rm -rf ${cur_dir}/src/${Openssl_Ver}
+    [[ -d "${cur_dir}/src/${Openssl_New_Ver}" ]] && rm -rf ${cur_dir}/src/${Openssl_New_Ver}
     /etc/init.d/nginx start
     Add_Iptables_Rules
     \cp ${cur_dir}/conf/index.html ${Default_Website_Dir}/index.html
@@ -116,6 +119,7 @@ Install_Database()
         /etc/init.d/mysql start
     fi
 
+    Clean_DB_Src_Dir
     Check_DB_Files
     if [[ "${isDB}" = "ok" ]]; then
         if [[ "${DBSelect}" =~ ^[12345]$ ]]; then
@@ -141,12 +145,17 @@ Install_Only_Database()
 
     Get_Dist_Name
     Check_DB
-    if [ ${DB_Name} != "None" ]; then
+    if [ "${DB_Name}" != "None" ]; then
         echo "You have install ${DB_Name}!"
         exit 1
     fi
 
     Database_Selection
+    if [ "${DBSelect}" = "0" ]; then
+        echo "DO NOT Install MySQL or MariaDB."
+        exit 1
+    fi
+    Echo_Red "The script will REMOVE MySQL/MariaDB installed via yum or apt-get and it's databases!!!"
     Press_Install
     Install_Database 2>&1 | tee /root/install_database.log
 }

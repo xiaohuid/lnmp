@@ -34,7 +34,7 @@ Install_Nginx_Lua()
         Echo_Blue "[+] Installing ${Luajit_Ver}... "
         tar zxf ${LuaNginxModule}.tar.gz
         tar zxf ${NgxDevelKit}.tar.gz
-        if [[ ! -s /usr/local/luajit/bin/luajit || ! -s /usr/local/luajit/include/luajit-2.0/luajit.h || ! -s /usr/local/luajit/lib/libluajit-5.1.so ]]; then
+        if [[ ! -s /usr/local/luajit/bin/luajit || ! -s /usr/local/luajit/include/luajit-2.1/luajit.h || ! -s /usr/local/luajit/lib/libluajit-5.1.so ]]; then
             Tar_Cd ${Luajit_Ver}.tar.gz ${Luajit_Ver}
             make
             make install PREFIX=/usr/local/luajit
@@ -54,7 +54,7 @@ EOF
 
         cat >/etc/profile.d/luajit.sh<<EOF
 export LUAJIT_LIB=/usr/local/luajit/lib
-export LUAJIT_INC=/usr/local/luajit/include/luajit-2.0
+export LUAJIT_INC=/usr/local/luajit/include/luajit-2.1
 EOF
 
         source /etc/profile.d/luajit.sh
@@ -104,11 +104,13 @@ Install_Nginx()
     \cp conf/pathinfo.conf /usr/local/nginx/conf/pathinfo.conf
     \cp conf/enable-php.conf /usr/local/nginx/conf/enable-php.conf
     \cp conf/enable-php-pathinfo.conf /usr/local/nginx/conf/enable-php-pathinfo.conf
-    \cp conf/enable-ssl-example.conf /usr/local/nginx/conf/enable-ssl-example.conf
-    \cp conf/magento2-example.conf /usr/local/nginx/conf/magento2-example.conf
-    \cp conf/nginx-reverse-proxy-example.conf /usr/local/nginx/conf/nginx-reverse-proxy-example.conf
+    \cp -ra conf/example /usr/local/nginx/conf/example
     if [ "${Enable_Nginx_Lua}" = 'y' ]; then
-        sed -i "/location \/nginx_status/i\        location /lua\n        {\n            default_type text/html;\n            content_by_lua 'ngx.say\(\"hello world\"\)';\n        }\n" /usr/local/nginx/conf/nginx.conf
+        if [ "${Stack}" = "lnmp" ]; then
+            sed -i "/include enable-php.conf;/i\        location /lua\n        {\n            default_type text/html;\n            content_by_lua 'ngx.say\(\"hello world\"\)';\n        }\n" /usr/local/nginx/conf/nginx.conf
+        else
+            sed -i "/include proxy-pass-php.conf;/i\        location /lua\n        {\n            default_type text/html;\n            content_by_lua 'ngx.say\(\"hello world\"\)';\n        }\n" /usr/local/nginx/conf/nginx.conf
+        fi
     fi
 
     mkdir -p ${Default_Website_Dir}
@@ -136,6 +138,7 @@ EOF
     fi
 
     \cp init.d/init.d.nginx /etc/init.d/nginx
+    \cp init.d/nginx.service /etc/systemd/system/nginx.service
     chmod +x /etc/init.d/nginx
 
     if [ "${SelectMalloc}" = "3" ]; then
@@ -150,8 +153,6 @@ google_perftools_profiles /tmp/tcmalloc;' /usr/local/nginx/conf/nginx.conf
         if echo $uname_r|grep -Eq "^3\.(9|1[0-9])*|^[4-9]\.*"; then
             echo "3.9+";
             sed -i 's/listen 80 default_server;/listen 80 default_server reuseport;/g' /usr/local/nginx/conf/nginx.conf
-            sed -i 's/listen 80;/listen 80 reuseport;/g' ${cur_dir}/conf/${Stack}
-            sed -i 's/listen 443 ssl http2;/listen 443 ssl http2 reuseport;/g' ${cur_dir}/conf/${Stack}
         fi
     fi
 }
