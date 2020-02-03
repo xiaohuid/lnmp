@@ -22,6 +22,7 @@ Luajit_Ver='luajit2-2.1-20190329'
 LuaNginxModule='lua-nginx-module-0.10.14'
 NgxDevelKit='ngx_devel_kit-0.3.1'
 Nginx_Ver='nginx-1.16.1'
+
 if [ "${DBSelect}" = "1" ]; then
     Mysql_Ver='mysql-5.1.73'
 elif [ "${DBSelect}" = "2" ]; then
@@ -32,6 +33,7 @@ elif [ "${DBSelect}" = "4" ]; then
     Mysql_Ver='mysql-5.7.28'
 elif [ "${DBSelect}" = "5" ]; then
     Mysql_Ver='mysql-8.0.18'
+
 elif [ "${DBSelect}" = "6" ]; then
     Mariadb_Ver='mariadb-5.5.66'
 elif [ "${DBSelect}" = "7" ]; then
