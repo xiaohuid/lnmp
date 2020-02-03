@@ -34,6 +34,7 @@ elif [ "${DBSelect}" = "4" ]; then
 elif [ "${DBSelect}" = "5" ]; then
     Mysql_Ver='mysql-8.0.18'
 
+
 elif [ "${DBSelect}" = "6" ]; then
     Mariadb_Ver='mariadb-5.5.66'
 elif [ "${DBSelect}" = "7" ]; then
@@ -65,6 +66,7 @@ elif [ "${PHPSelect}" = "9" ]; then
     Php_Ver='php-7.3.14'
 elif [ "${PHPSelect}" = "10" ]; then
     Php_Ver='php-7.4.2'
+
 fi
 if [[ "${PHPSelect}" =~ ^[123]$ ]]; then
     PhpMyAdmin_Ver='phpMyAdmin-4.0.10.20-all-languages'
