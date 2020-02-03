@@ -20,7 +20,12 @@ Install_Redis()
         Download_Files http://download.redis.io/releases/${Redis_Stable_Ver}.tar.gz ${Redis_Stable_Ver}.tar.gz
         Tar_Cd ${Redis_Stable_Ver}.tar.gz ${Redis_Stable_Ver}
 
-        if [ "${Is_64bit}" = "y" ] ; then
+        Get_OS_Bit
+        Get_ARM
+        if [ "${Is_ARM}" = "y" ]; then
+            sed -i 's/FINAL_LIBS=-lm/FINAL_LIBS=-lm -latomic/' src/Makefile
+        fi
+        if [[ "${Is_64bit}" = "y" || "${Is_ARM}" = "y" ]]; then
             make PREFIX=/usr/local/redis install
         else
             make CFLAGS="-march=i686" PREFIX=/usr/local/redis install
@@ -61,6 +66,9 @@ Install_Redis()
     if echo "${Cur_PHP_Version}" | grep -Eqi '^5.2.';then
         Download_Files http://pecl.php.net/get/redis-2.2.7.tgz redis-2.2.7.tgz
         Tar_Cd redis-2.2.7.tgz redis-2.2.7
+    elif echo "${Cur_PHP_Version}" | grep -Eqi '^5.[3456].';then
+        Download_Files http://pecl.php.net/get/redis-4.3.0.tgz redis-4.3.0.tgz
+        Tar_Cd redis-4.3.0.tgz redis-4.3.0
     else
         Download_Files http://pecl.php.net/get/${PHPRedis_Ver}.tgz ${PHPRedis_Ver}.tgz
         Tar_Cd ${PHPRedis_Ver}.tgz ${PHPRedis_Ver}
